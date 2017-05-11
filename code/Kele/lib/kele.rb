@@ -33,4 +33,22 @@ include Roadmap
     puts timeslots
   end
 
+  def get_messages(page = 0)
+    if page != 0
+      response = self.class.get("https://www.bloc.io/api/v1/message_threads", headers: { "authorization" => @auth_token })
+    else
+      response = self.class.get("https://www.bloc.io/api/v1/message_threads?page=#{page}", headers: { "authorization" => @auth_token })
+    end
+    @messages = JSON.parse(response.body)
+  end
+
+  def create_message(user_id, recipient_id, subject, stripped_text)
+    response = self.class.post("https://www.bloc.io/api/v1/messages", headers: { "authorization" => @auth_token }, body: { user_id: user_id, recipient_id: recipient_id, subject: subject, "stripped-text" => stripped_text })
+    if response.success?
+      puts "message sent successfully"
+    else
+      puts "message not sent"
+    end
+  end
+
 end
