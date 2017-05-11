@@ -16,6 +16,7 @@ include Roadmap
   def get_me
     response = self.class.get("https://www.bloc.io/api/v1/users/me", headers: { "authorization" => @auth_token })
     @parsed_response = JSON.parse(response.body)
+    @user_id = @parsed_response["current_enrollment"]["id"]
   end
 
   def get_mentor_availability(mentor_id)
@@ -48,6 +49,16 @@ include Roadmap
       puts "message sent successfully"
     else
       puts "message not sent"
+    end
+  end
+
+  def create_submission(assignment_branch, assignment_commit_link, checkpoint_id, comment, enrollment_id = @user_id)
+    response = self.class.post("https://www.bloc.io/api/v1/checkpoint_submissions", headers: { "authorization" => @auth_token }, body: { assignment_branch: assignment_branch, assignment_commit_link: assignment_commit_link, checkpoint_id: checkpoint_id, comment: comment, enrollment_id: enrollment_id })
+    JSON.parse(response.body)
+    if response.success?
+      puts "checkpoint submitted"
+    else
+      puts "checkpoint could not be submitted"
     end
   end
 
